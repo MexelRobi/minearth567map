@@ -50,14 +50,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
-      - name: Build Jekyll for GitHub Pages
-        uses: actions/jekyll-build-pages@v1.0.13
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: server_download
 
-      - name: Upload GitHub Pages artifact
-        uses: actions/upload-pages-artifact@v4.0.0
-
-      - name: Deploy GitHub Pages site
-        uses: actions/deploy-pages@v4.0.5
-
+      - name: Deploy GitHub Pages
+        uses: actions/deploy-pages@v4
       
           
