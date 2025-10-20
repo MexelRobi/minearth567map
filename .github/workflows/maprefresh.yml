@@ -1,4 +1,4 @@
-name: Download from SFTP and commit
+name: maprefresh
 
 on:
   workflow_dispatch: # manuell starten
