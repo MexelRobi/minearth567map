@@ -38,7 +38,7 @@ jobs:
           SFTP_PASS: ${{ secrets.SFTP_PASS }}
         run: |
           mkdir -p server_download
-          duck --username $SFTP_USER --password $SFTP_PASS -y --parallel 8 --download $SFTP_HOST server-download
+          duck --username $SFTP_USER --password $SFTP_PASS -y --parallel 8 --download $SFTP_HOST server_download
 
       - name: Commit downloaded files
         run: |
@@ -53,7 +53,7 @@ jobs:
       - name: Upload to GitHub Pages
         uses: actions/upload-pages-artifact@v4
         with:
-          path: /
+          path: server_download/
 
       - name: Deploy GitHub Pages
         uses: actions/deploy-pages@v4
