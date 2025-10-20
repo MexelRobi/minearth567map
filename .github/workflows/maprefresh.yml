@@ -27,7 +27,7 @@ jobs:
           SFTP_PASS: ${{ secrets.SFTP_PASS }}
         run: |
           mkdir -p server_download
-          duck --username $SFTP_USER --password $SFTP_PASS --trust-server-fingerprint --download $SFTP_HOST server-download
+          duck --username $SFTP_USER --password $SFTP_PASS -y --download $SFTP_HOST server-download
 
       - name: Commit downloaded files
         run: |
