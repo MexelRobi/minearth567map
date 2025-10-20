@@ -24,8 +24,10 @@ jobs:
           SFTP_PATH: ${{ secrets.SFTP_PATH }}
         run: |
           mkdir -p server_download
+          mkdir -p ~/.ssh
+          ssh-keyscan -H $SFTP_HOST >> ~/.ssh/known_hosts
           lftp -u "$SFTP_USER","$SFTP_PASS" sftp://$SFTP_HOST <<EOF
-          mirror --verbose "$SFTP_PATH" server_download
+          mirror --verbose --only-newer "$SFTP_PATH" server_download
           bye
           EOF
 
