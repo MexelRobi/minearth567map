@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: https://mexelrobi.github.io/minearth567map
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout repository
@@ -37,18 +37,7 @@ jobs:
           SFTP_USER: ${{ secrets.SFTP_USER }}
           SFTP_PASS: ${{ secrets.SFTP_PASS }}
         run: |
-          mkdir -p server_download
-          duck --username $SFTP_USER --password $SFTP_PASS -y --parallel 8 --download $SFTP_HOST server_download
-
-      - name: Commit downloaded files
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "Update files from SFTP server" || echo "No changes to commit"
-          git push --force
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          duck --username $SFTP_USER --password $SFTP_PASS -y --parallel 8 --download $SFTP_HOST server-download
 
       - name: Upload to GitHub Pages
         uses: actions/upload-pages-artifact@v4
