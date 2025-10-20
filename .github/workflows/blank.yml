@@ -1,7 +1,9 @@
-name: map refresh
+name: Download from SFTP and commit
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # manuell starten
+  schedule:
+    - cron: "0 0 * * *" # optional: täglich um 00:00 Uhr
 
 jobs:
   sftp-download:
@@ -11,9 +13,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install Duck CLI
-        run: |
-          curl -L https://duck.sh/duck.sh | sudo sh
+      - name: Install lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
 
       - name: Download from SFTP
         env:
@@ -23,7 +24,10 @@ jobs:
           SFTP_PATH: ${{ secrets.SFTP_PATH }}
         run: |
           mkdir -p server_download
-          duck --username="$SFTP_USER" --password="$SFTP_PASS" "sftp://$SFTP_HOST/$SFTP_PATH" server_download
+          lftp -u "$SFTP_USER","$SFTP_PASS" sftp://$SFTP_HOST <<EOF
+          mirror --verbose "$SFTP_PATH" server_download
+          bye
+          EOF
 
       - name: Commit downloaded files
         run: |
