@@ -28,7 +28,7 @@ jobs:
           SFTP_PATH: ${{ secrets.SFTP_PATH }}
         run: |
           mkdir -p server_download
-          duck --username="$SFTP_USER" --password="$SFTP_PASS" "sftp://$SFTP_HOST/$SFTP_PATH" server_download
+          duck -d --username="$SFTP_USER" --password="$SFTP_PASS" "sftp://$SFTP_HOST/$SFTP_PATH/" server_download
 
       - name: Commit downloaded files
         run: |
