@@ -27,7 +27,8 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H $SFTP_HOST >> ~/.ssh/known_hosts
           lftp -u "$SFTP_USER","$SFTP_PASS" sftp://$SFTP_HOST <<EOF
-          mirror --verbose --only-newer "$SFTP_PATH" server_download
+          set sftp:connect-program "ssh -a -x -o ConnectTimeout=10"
+          mirror --verbose --only-newer --parallel=8 "$SFTP_PATH" server_download
           bye
           EOF
 
