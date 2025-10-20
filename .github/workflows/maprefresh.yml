@@ -1,9 +1,9 @@
 name: maprefresh
 
 on:
-  workflow_dispatch: # manuell starten
+  workflow_dispatch:
   schedule:
-    - cron: "0 0 * * *" # optional: täglich um 00:00 Uhr
+    - cron: "0 0 * * *"
 
 jobs:
   sftp-download:
@@ -13,10 +13,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install lftp
-        run: sudo apt-get update && sudo apt-get install -y lftp
+      - name: Install Duck CLI
+        run: |
+          echo -e "deb https://s3.amazonaws.com/repo.deb.cyberduck.io stable main" | sudo tee /etc/apt/sources.list.d/cyberduck.list > /dev/null
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys FE7097963FEFBE72
+          sudo apt-get update
+          sudo apt-get install -y duck
 
-      - name: Download from SFTP
+      - name: Download from SFTP with Duck
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
           SFTP_USER: ${{ secrets.SFTP_USER }}
@@ -24,13 +28,7 @@ jobs:
           SFTP_PATH: ${{ secrets.SFTP_PATH }}
         run: |
           mkdir -p server_download
-          mkdir -p ~/.ssh
-          ssh-keyscan -H $SFTP_HOST >> ~/.ssh/known_hosts
-          lftp -u "$SFTP_USER","$SFTP_PASS" sftp://$SFTP_HOST <<EOF
-          set sftp:connect-program "ssh -a -x -o ConnectTimeout=10"
-          mirror --verbose --only-newer --parallel=8 "$SFTP_PATH" server_download
-          bye
-          EOF
+          duck --username="$SFTP_USER" --password="$SFTP_PASS" "sftp://$SFTP_HOST/$SFTP_PATH" server_download
 
       - name: Commit downloaded files
         run: |
