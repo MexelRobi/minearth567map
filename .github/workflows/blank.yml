@@ -1,0 +1,36 @@
+name: map refresh
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sftp-download:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Duck CLI
+        run: |
+          curl -L https://duck.sh/duck.sh | sudo sh
+
+      - name: Download from SFTP
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASS: ${{ secrets.SFTP_PASS }}
+          SFTP_PATH: ${{ secrets.SFTP_PATH }}
+        run: |
+          mkdir -p server_download
+          duck --username="$SFTP_USER" --password="$SFTP_PASS" "sftp://$SFTP_HOST/$SFTP_PATH" server_download
+
+      - name: Commit downloaded files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add server_download
+          git commit -m "Update files from SFTP server" || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
