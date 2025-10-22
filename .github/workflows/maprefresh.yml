@@ -56,7 +56,7 @@ jobs:
     needs: mapfetch
     steps:
       - name: Wait for GitHub to register push
-        run: sleep 10
+        run: sleep 30
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Pages
