@@ -14,8 +14,6 @@ permissions:
 jobs:
   mapfetch:
     runs-on: ubuntu-latest
-    
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -35,7 +33,13 @@ jobs:
           SFTP_USER: ${{ secrets.SFTP_USER }}
           SFTP_PASS: ${{ secrets.SFTP_PASS }}
         run: |
-          duck --username $SFTP_USER --password $SFTP_PASS -y --parallel 16 --download $SFTP_HOST server-download
+          mkdir -p tmp-download
+          duck --username $SFTP_USER --password $SFTP_PASS -y --parallel 16 --download $SFTP_HOST/web tmp-download
+
+      - name: Move files to repo root
+        run: |
+          mv tmp-download/* .
+          rm -rf tmp-download
 
       - name: Commit downloaded files
         run: |
@@ -46,6 +50,7 @@ jobs:
           git push --force
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
 
       
   ghpages:
