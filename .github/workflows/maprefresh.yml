@@ -37,7 +37,7 @@ jobs:
         run: |
           mkdir -p temp-download
           duck --username $SFTP_USER --password $SFTP_PASS -y --parallel 16 --download $SFTP_HOST temp-download
-          mv temp-download/* .
+          rsync -a temp-download/ ./
           rm -rf temp-download
 
       - name: Commit downloaded files
